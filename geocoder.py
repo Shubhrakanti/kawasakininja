@@ -102,35 +102,12 @@ def makedata(mtheat):
         os.rename(os.getcwd()+ "/" +mtheat+ ' Geocoded Data.xlsx', newpath+'/' + mtheat + ' Geocoded Data.xlsx')
 
 
-        # df_all = df.merge(dfold.drop_duplicates(),
-        #            how='left', indicator=True)
-        # newentry =
+
 
 
 
 
 
 makedata("RGC")
-
-# df = pd.read_excel("RGC.xlsx")
-#
-# lats = []
-# longs = []
-#
-# for x in df["Address"].values:
-#
-#     lat,long= get_lat_long(x)
-#     lats.append(lat)
-#     longs.append(long)
-#
-# lats = np.array(lats)
-# longs = np.array(longs)
-#
-# df["lats"] = lats
-# df["longs"] = longs
-#
-# writer = pd.ExcelWriter('RGC Data.xlsx')
-#
-# df.to_excel(writer,'Data')
-#
-# writer.save()
+makedata("CNK")
+makedata("AMC")
