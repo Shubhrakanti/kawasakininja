@@ -1,9 +1,10 @@
 import pandas as pd
 import plotly
+from pathlib import Path
 
-AMC_df = pd.read_excel("AMC Data.xlsx")
-CNK_df = pd.read_excel("CNK Data.xlsx")
-RGC_df = pd.read_excel("RGC Data.xlsx")
+AMC_df = pd.read_excel("Geocoded Data/AMC Geocoded Data.xlsx")
+CNK_df = pd.read_excel("Geocoded Data/CNK Geocoded Data.xlsx")
+RGC_df = pd.read_excel("Geocoded Data/RGC Geocoded Data.xlsx")
 
 data = dict(
         type = 'scattergeo',
@@ -39,4 +40,8 @@ layout = dict(
     )
 
 fig = dict(data=[data_AMC, data_CNK, data_RGC], layout=layout)
-plotly.plotly.plot(fig)
+plot_url = plotly.plotly.plot(fig)
+
+f = open("plot_url.txt","w+")
+f.write(plot_url)
+f.close()

@@ -2,9 +2,9 @@ import pandas as pd
 from math import sin, cos, sqrt, atan2, radians
 
 #read excel sheets with all the data
-AMC_all_df = pd.read_excel("AMC Data.xlsx")
-CNK_all_df = pd.read_excel("CNK Data.xlsx")
-RGC_all_df = pd.read_excel("RGC Data.xlsx")
+AMC_all_df = pd.read_excel("Geocoded Data/AMC Geocoded Data.xlsx")
+CNK_all_df = pd.read_excel("Geocoded Data/CNK Geocoded Data.xlsx")
+RGC_all_df = pd.read_excel("Geocoded Data/RGC Geocoded Data.xlsx")
 
 #seperate the premium loctations for each brand
 AMC_premium_df = AMC_all_df[AMC_all_df["Seating"] == 1.0]
@@ -59,7 +59,7 @@ def AMC_percent_in_rad_premium(num_loc,rad):
                 if current_intersects == num_loc:
                     num_locations_with_intersects.append(amc_location[1]["Address"])
                     break
-    return len(num_locations_with_intersects)/AMC_premium_df["Address"].count()
+    return len(num_locations_with_intersects)/CNK_premium_df["Address"].count()
 
 
 def RGC_percent_in_rad_premium(num_loc,rad):
@@ -82,16 +82,62 @@ def RGC_percent_in_rad_premium(num_loc,rad):
                 if current_intersects == num_loc:
                     num_locations_with_intersects.append(rgc_location[1]["Address"])
                     break
+    return len(num_locations_with_intersects)/CNK_premium_df["Address"].count()
+
+
+def CNK_percent_in_rad_premium(num_loc,rad):
+
+    num_locations_with_intersects = []
+    for cnk_location in CNK_premium_df.iterrows():
+        current_intersects = 0
+        check_rgc = True
+        for amc_location in AMC_premium_df.iterrows():
+            if get_distance(cnk_location[1]["lats"],cnk_location[1]["longs"],amc_location[1]["lats"],amc_location[1]["longs"]) <= rad:
+                current_intersects += 1
+            if current_intersects == num_loc:
+                num_locations_with_intersects.append(cnk_location[1]["Address"])
+                check_cnk = False
+                break
+        if check_rgc:
+            for rgc_location in RGC_premium_df.iterrows():
+                if get_distance(cnk_location[1]["lats"],cnk_location[1]["longs"],rgc_location[1]["lats"],rgc_location[1]["longs"]) <= rad:
+                    current_intersects += 1
+                if current_intersects == num_loc:
+                    num_locations_with_intersects.append(cnk_location[1]["Address"])
+                    break
+    return len(num_locations_with_intersects)/CNK_premium_df["Address"].count()
+
+#Functions calculate the percent of premium locations that have at least "num_loc"
+#number of non premium location from any company in a "rad" mile radius
+def AMC_percent_in_rad_reg(num_loc,rad):
+
+    num_locations_with_intersects = []
+    for amc_location in AMC_premium_df.iterrows():
+        current_intersects = 0
+        check_cnk = True
+        for rgc_location in RGC_reg_df.iterrows():
+            if get_distance(rgc_location[1]["lats"],rgc_location[1]["longs"],amc_location[1]["lats"],amc_location[1]["longs"]) <= rad:
+                current_intersects += 1
+            if current_intersects == num_loc:
+                num_locations_with_intersects.append(amc_location[1]["Address"])
+                check_cnk = False
+                break
+        if check_cnk:
+            for cnk_location in CNK_reg_df.iterrows():
+                if get_distance(cnk_location[1]["lats"],cnk_location[1]["longs"],amc_location[1]["lats"],amc_location[1]["longs"]) <= rad:
+                    current_intersects += 1
+                if current_intersects == num_loc:
+                    num_locations_with_intersects.append(amc_location[1]["Address"])
+                    break
     return len(num_locations_with_intersects)/AMC_premium_df["Address"].count()
 
-
-def RGC_percent_in_rad_premium(num_loc,rad):
+def RGC_percent_in_rad_reg(num_loc,rad):
 
     num_locations_with_intersects = []
     for rgc_location in RGC_premium_df.iterrows():
         current_intersects = 0
         check_cnk = True
-        for amc_location in AMC_premium_df.iterrows():
+        for amc_location in AMC_reg_df.iterrows():
             if get_distance(rgc_location[1]["lats"],rgc_location[1]["longs"],amc_location[1]["lats"],amc_location[1]["longs"]) <= rad:
                 current_intersects += 1
             if current_intersects == num_loc:
@@ -99,12 +145,39 @@ def RGC_percent_in_rad_premium(num_loc,rad):
                 check_cnk = False
                 break
         if check_cnk:
-            for cnk_location in CNK_premium_df.iterrows():
+            for cnk_location in CNK_reg_df.iterrows():
                 if get_distance(cnk_location[1]["lats"],cnk_location[1]["longs"],rgc_location[1]["lats"],rgc_location[1]["longs"]) <= rad:
                     current_intersects += 1
                 if current_intersects == num_loc:
                     num_locations_with_intersects.append(rgc_location[1]["Address"])
                     break
-    return len(num_locations_with_intersects)/AMC_premium_df["Address"].count()
+    return len(num_locations_with_intersects)/RGC_premium_df["Address"].count()
 
-print(RGC_percent_in_rad_premium(1,15))
+def CNK_percent_in_rad_reg(num_loc,rad):
+
+    num_locations_with_intersects = []
+    for cnk_location in CNK_premium_df.iterrows():
+        current_intersects = 0
+        check_rgc = True
+        for amc_location in AMC_reg_df.iterrows():
+            if get_distance(cnk_location[1]["lats"],cnk_location[1]["longs"],amc_location[1]["lats"],amc_location[1]["longs"]) <= rad:
+                current_intersects += 1
+            if current_intersects == num_loc:
+                num_locations_with_intersects.append(cnk_location[1]["Address"])
+                check_cnk = False
+                break
+        if check_rgc:
+            i=0
+            for rgc_location in RGC_reg_df.iterrows():
+                i+=1
+                print(i)
+                if get_distance(cnk_location[1]["lats"],cnk_location[1]["longs"],rgc_location[1]["lats"],rgc_location[1]["longs"]) <= rad:
+                    current_intersects += 1
+                if current_intersects == num_loc:
+                    num_locations_with_intersects.append(cnk_location[1]["Address"])
+                    break
+
+    return len(num_locations_with_intersects)/CNK_premium_df["Address"].count()
+
+
+print(CNK_percent_in_rad_reg(1,15))
